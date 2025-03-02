@@ -14,7 +14,7 @@ class Addresses:
             self.bought_from_worker_bots: int = 0x1395CD
             self.ship_shack_discovered: int = 0x1395CF
             self.dobbo_defeat_thug_leader: int = 0x1395E6
-            self.electrolyzer_battle_victories: int = 0x1395E9
+            self.maktar_arena_challenge_wins: int = 0x1395E9
             self.barlow_hoverbike_race_victories: int = 0x139605
             self.feltzin_challenge_wins: int = 0x139619
             self.hrugis_challenge_wins: int = 0x13961E

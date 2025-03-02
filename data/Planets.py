@@ -19,11 +19,21 @@ OOZLA = PlanetData("Oozla", 1, [
     OOZLA_SWAMP_MONSTER_II,
 ])
 MAKTAR_NEBULA = PlanetData("Maktar Nebula", 2, [
-    MAKTAR_ARENA_CHALLENGE,
+    MAKTAR_ARENA_ELECTROLYZER,
     MAKTAR_PHOTO_BOOTH,
     MAKTAR_DEACTIVATE_JAMMING_ARRAY,
     MAKTAR_JAMMING_ARRAY_PB,
     MAKTAR_CRANE_PB,
+    MAKTAR_ARENA_CHAINBLADE,
+    MAKTAR_ARENA_TIME_30S,
+    MAKTAR_ARENA_HAZARD,
+    MAKTAR_ARENA_B2_BRAWLER,
+    MAKTAR_ARENA_TIME_60S,
+    MAKTAR_ARENA_MEGA_CHALLENGE,
+    MAKTAR_ARENA_LIMITED_WEAPON_CHALLENGE,
+    MAKTAR_ARENA_TAG_TEAM,
+    MAKTAR_ARENA_ENDURANCE,
+    MAKTAR_ARENA_ULTIMATE,
 ])
 ENDAKO = PlanetData("Endako", 3, [
     ENDAKO_CLANK_APARTMENT_SS,
@@ -200,7 +210,7 @@ class SpaceshipSystemTextInfo(NamedTuple):
 
 # This dictionary is used by the `process_spaceship_text` function in the game client in order to know how to properly
 # set dynamic text in the spaceship challenge menus
-SPACESHIP_SYSTEMS: Dict[int, SpaceshipSystemTextInfo] = {
+SPACESHIP_SYSTEMS_TEXT: Dict[int, SpaceshipSystemTextInfo] = {
     FELTZIN_SYSTEM.number: SpaceshipSystemTextInfo(
         challenge_descriptions=[0x2FDB, 0x2FDD, 0x2FDC, 0x2FDF],
         challenge_locations=[
@@ -234,6 +244,31 @@ SPACESHIP_SYSTEMS: Dict[int, SpaceshipSystemTextInfo] = {
         perfect_race_location=GORN_RACE_PB.location_id,
         challenge_1_completed_text=0x11FF,
     )
+}
+
+
+class ArenaLocationTextInfo(NamedTuple):
+    text_id: int
+    text_string: str
+    requires_extra_challenges_option: bool = True
+
+
+MAKTAR_ARENA_LOCATIONS_TEXT: Dict[int, ArenaLocationTextInfo] = {
+    MAKTAR_ARENA_ELECTROLYZER.location_id: ArenaLocationTextInfo(0x2F48, "First Challenge", False),
+    MAKTAR_ARENA_CHAINBLADE.location_id: ArenaLocationTextInfo(0x2F49, "Chainblade Challenge"),
+    MAKTAR_ARENA_TIME_30S.location_id: ArenaLocationTextInfo(0x2F4D, "Timed Challenge (30s)"),
+    MAKTAR_ARENA_HAZARD.location_id: ArenaLocationTextInfo(0x2F4E, "Hazard Challenge"),
+    MAKTAR_ARENA_B2_BRAWLER.location_id: ArenaLocationTextInfo(0x2F4A, "Battle the B2 Brawler"),
+    MAKTAR_ARENA_TIME_60S.location_id: ArenaLocationTextInfo(0x2F4F, "Timed Challenge (60s)"),
+    MAKTAR_ARENA_MEGA_CHALLENGE.location_id: ArenaLocationTextInfo(0x2F4C, "Mega Challenge"),
+    MAKTAR_ARENA_LIMITED_WEAPON_CHALLENGE.location_id: ArenaLocationTextInfo(0x2F6E, "Limited Weapon Challenge"),  # TODO: Test if lancer not owned?
+    MAKTAR_ARENA_TAG_TEAM.location_id: ArenaLocationTextInfo(0x2F4B, "Tag Team Battle"),
+    MAKTAR_ARENA_ENDURANCE.location_id: ArenaLocationTextInfo(0x2F50, "Endurance Challenge"),
+    MAKTAR_ARENA_ULTIMATE.location_id: ArenaLocationTextInfo(0x2F51, "Ultimate Challenge"),
+}
+
+JOBA_ARENA_LOCATIONS_TEXT: Dict[int, ArenaLocationTextInfo] = {
+    # TODO
 }
 
 

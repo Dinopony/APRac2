@@ -1,7 +1,10 @@
+from typing import Dict
+
 from . import Locations
 from .Rac2Interface import Rac2Planet
 from .TextManager import *
 from .data import Items, Planets
+from .data.Planets import MAKTAR_ARENA_LOCATIONS_TEXT, JOBA_ARENA_LOCATIONS_TEXT, ArenaLocationTextInfo
 
 if TYPE_CHECKING:
     from .Rac2Client import Rac2Context
@@ -72,8 +75,9 @@ def replace_text(ctx: 'Rac2Context', ap_connected: bool):
             manager.inject(0x27AC, wrap_for_hud(f"\x12 Buy {item_name} for %d bolts"))
 
         elif ctx.current_planet is Rac2Planet.Maktar_Nebula:
-            item_name = get_rich_item_name_from_location(ctx, Locations.MAKTAR_ARENA_CHALLENGE.location_id)
+            item_name = get_rich_item_name_from_location(ctx, Locations.MAKTAR_ARENA_ELECTROLYZER.location_id)
             manager.inject(0x2F46, f"You have earned {item_name}")
+            process_arena_text(manager, ctx, MAKTAR_ARENA_LOCATIONS_TEXT)
 
         elif ctx.current_planet is Rac2Planet.Barlow:
             item_name = get_rich_item_name_from_location(ctx, Locations.BARLOW_INVENTOR.location_id)
@@ -95,6 +99,7 @@ def replace_text(ctx: 'Rac2Context', ap_connected: bool):
             item_name = get_rich_item_name_from_location(ctx, Locations.JOBA_ARENA_CAGE_MATCH.location_id)
             manager.inject(0x2F67, f"Cage Match for {item_name}")
             manager.inject(0x2F97, f"You have earned {item_name}")
+            process_arena_text(manager, ctx, JOBA_ARENA_LOCATIONS_TEXT)
 
         elif ctx.current_planet is Rac2Planet.Todano:
             item_name = get_rich_item_name_from_location(ctx, Locations.TODANO_STUART_ZURGO_TRADE.location_id)
@@ -125,7 +130,7 @@ def replace_text(ctx: 'Rac2Context', ap_connected: bool):
 
 
 def process_spaceship_text(manager: TextManager, ctx: 'Rac2Context'):
-    data = Planets.SPACESHIP_SYSTEMS.get(ctx.current_planet, None)
+    data = Planets.SPACESHIP_SYSTEMS_TEXT.get(ctx.current_planet, None)
     if data is None:
         return
     extra_locations = ctx.slot_data.get("extra_spaceship_challenge_locations", False)
@@ -165,3 +170,18 @@ def process_spaceship_text(manager: TextManager, ctx: 'Rac2Context'):
     else:
         text = f"{COLOR_GREEN}Perfect race reward already obtained"
     manager.inject(data.challenge_descriptions[3], wrap_for_spaceship_menu(text))
+
+
+def process_arena_text(manager: TextManager, ctx: 'Rac2Context', locations_text_data: Dict[int, ArenaLocationTextInfo]):
+    extra_locations = ctx.slot_data.get("extra_arena_challenge_locations", False)
+
+    for loc_id, text_data in locations_text_data.items():
+        if text_data.requires_extra_challenges_option and not extra_locations:
+            continue
+        item_name = get_rich_item_name_from_location(ctx, loc_id)
+
+        if loc_id not in ctx.checked_locations:
+            text = f"{text_data.text_string} for {item_name}"
+        else:
+            text = f"{text_data.text_string}\x01{COLOR_GREEN}(First completion reward obtained)"
+        manager.inject(text_data.text_id, text)

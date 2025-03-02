@@ -25,11 +25,61 @@ OOZLA_SWAMP_MONSTER_II = LocationData(
 )
 
 """ Maktar """
-MAKTAR_ARENA_CHALLENGE = LocationData(20, "Maktar: Arena Challenge - Electrolyzer")
+MAKTAR_ARENA_ELECTROLYZER = LocationData(20, "Maktar Arena: First Challenge")
 MAKTAR_PHOTO_BOOTH = LocationData(21, "Maktar: Photo Booth", can_electrolyze)
 MAKTAR_DEACTIVATE_JAMMING_ARRAY = LocationData(22, "Maktar: Deactivate Jamming Array", can_tractor)
 MAKTAR_JAMMING_ARRAY_PB = LocationData(23, "Maktar: Jamming Array - Platinum Bolt", can_tractor)
 MAKTAR_CRANE_PB = LocationData(24, "Maktar: Crane - Platinum Bolt")
+MAKTAR_ARENA_CHAINBLADE = LocationData(
+    2000, "Maktar Arena: Chainblade Challenge",
+    checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x1,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+MAKTAR_ARENA_TIME_30S = LocationData(
+    2001, "Maktar Arena: 30 Seconds Challenge",
+    checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x2,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+MAKTAR_ARENA_HAZARD = LocationData(
+    2002, "Maktar Arena: Hazard Challenge",
+    checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x3,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+MAKTAR_ARENA_B2_BRAWLER = LocationData(
+    2003, "Maktar Arena: Battle the B2 Brawler",
+    checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x4,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+MAKTAR_ARENA_TIME_60S = LocationData(
+    2004, "Maktar Arena: 60 Seconds Challenge",
+    checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x5,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+MAKTAR_ARENA_MEGA_CHALLENGE = LocationData(
+    2005, "Maktar Arena: Mega Challenge",
+    checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x6,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+MAKTAR_ARENA_LIMITED_WEAPON_CHALLENGE = LocationData(
+    2006, "Maktar Arena: Limited Weapon Challenge",
+    checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x7,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+MAKTAR_ARENA_TAG_TEAM = LocationData(
+    2007, "Maktar Arena: Tag Team Battle",
+    checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x8,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+MAKTAR_ARENA_ENDURANCE = LocationData(
+    2008, "Maktar Arena: Endurance Challenge",
+    checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x9,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+MAKTAR_ARENA_ULTIMATE = LocationData(
+    2009, "Maktar Arena: Ultimate Challenge",
+    checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0xA,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
 
 """ Endako """
 ENDAKO_CLANK_APARTMENT_SS = LocationData(30, "Endako: Clank's Apartment - Swingshot")

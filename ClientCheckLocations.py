@@ -41,7 +41,7 @@ INVENTORY_OFFSET_TO_LOCATION_ID: Dict[int, int] = {
     Items.GRIND_BOOTS.offset: Locations.ENDAKO_CLANK_APARTMENT_GB.location_id,
     Items.GLIDER.offset: Locations.TABORA_UNDERGROUND_MINES_END.location_id,
     Items.DYNAMO.offset: Locations.OOZLA_OUTSIDE_MEGACORP_STORE.location_id,
-    Items.ELECTROLYZER.offset: Locations.MAKTAR_ARENA_CHALLENGE.location_id,
+    Items.ELECTROLYZER.offset: Locations.MAKTAR_ARENA_ELECTROLYZER.location_id,
     Items.THERMANATOR.offset: Locations.BARLOW_INVENTOR.location_id,
     Items.TRACTOR_BEAM.offset: Locations.OOZLA_MEGACORP_SCIENTIST.location_id,
     Items.QWARK_STATUETTE.offset: Locations.ARANOS_PLUMBER.location_id,

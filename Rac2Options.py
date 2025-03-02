@@ -82,6 +82,12 @@ class ExtraSpaceshipChallengeLocations(Toggle):
     display_name = "Extra Spaceship Challenge Locations"
 
 
+class ExtraArenaChallengeLocations(Toggle):
+    """In the vanilla game, only the first challenge of Maktar arena and the first two challenges of Joba arena give
+    a unique item as a reward. If enabled, every arena challenge rewards an item on first completion."""
+    display_name = "Extra Arena Challenge Locations"
+
+
 @dataclass
 class Rac2Options(PerGameCommonOptions):
     start_inventory_from_pool: StartInventoryPool
@@ -96,3 +102,4 @@ class Rac2Options(PerGameCommonOptions):
     nanotech_xp_multiplier: NanotechExperienceMultiplier
     weapon_xp_multiplier: WeaponExperienceMultiplier
     extra_spaceship_challenge_locations: ExtraSpaceshipChallengeLocations
+    extra_arena_challenge_locations: ExtraArenaChallengeLocations

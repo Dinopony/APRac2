@@ -136,6 +136,7 @@ class Rac2World(World):
             "death_link",
             "skip_wupash_nebula",
             "extra_spaceship_challenge_locations",
+            "extra_arena_challenge_locations"
         )
 
     def fill_slot_data(self) -> Mapping[str, Any]:
