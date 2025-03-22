@@ -75,6 +75,7 @@ class Rac2Context(CommonContext):
     last_error_message: Optional[str] = None
     death_link_enabled = False
     queued_deaths: int = 0
+    previous_decoy_glove_ammo: int = 0
 
     def __init__(self, server_address, password):
         super().__init__(server_address, password)
@@ -188,18 +189,19 @@ async def _handle_game_ready(ctx: Rac2Context):
             if current_planet is not None:
                 logger.info(f"Loaded planet {current_planet} ({current_planet.name})")
             await asyncio.sleep(1)
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.1)
         return
     elif ctx.game_interface.is_loading():
         ctx.game_interface.logger.info("Waiting for planet to load...")
         ctx.is_loading = True
         return
 
-    if ctx.current_planet != ctx.game_interface.get_current_planet():
+    connected_to_server = (ctx.server is not None) and (ctx.slot is not None)
+    if ctx.current_planet != ctx.game_interface.get_current_planet() and connected_to_server:
         ctx.previous_planet = ctx.current_planet
         ctx.current_planet = ctx.game_interface.get_current_planet()
-        init(ctx, ctx.server is not None and ctx.slot is not None)
-    update(ctx, ctx.server is not None and ctx.slot is not None)
+        init(ctx)
+    update(ctx, connected_to_server)
 
     if ctx.server:
         ctx.last_error_message = None
@@ -208,14 +210,15 @@ async def _handle_game_ready(ctx: Rac2Context):
             return
 
         current_inventory = ctx.game_interface.get_current_inventory()
-        if ctx.current_planet is not None and ctx.current_planet > 0 and ctx.game_interface.get_pause_state() == 0:
+        if ctx.current_planet is not None and ctx.current_planet > 0 and ctx.game_interface.get_pause_state() in [0, 5]:
             await handle_received_items(ctx, current_inventory)
-        await handle_checked_location(ctx)
+        if ctx.current_planet and ctx.current_planet > 0:
+            await handle_checked_location(ctx)
         await handle_check_goal_complete(ctx)
 
         if ctx.death_link_enabled:
             await handle_deathlink(ctx)
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.1)
     else:
         message = "Waiting for player to connect to server"
         if ctx.last_error_message is not message:
@@ -289,6 +292,7 @@ def get_pcsx2_crc(iso_path: str) -> Optional[int]:
             crc ^= int.from_bytes(iso_file.read(4), "little")
 
     return crc
+
 
 def launch():
     Utils.init_logging("RAC2 Client")

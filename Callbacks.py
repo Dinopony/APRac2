@@ -1,10 +1,13 @@
 from typing import Dict
 
 from . import Locations
-from .Rac2Interface import Rac2Planet
+from .Rac2Interface import Rac2Planet, Rac2Interface, PauseState, Vendor, MissingAddressError
 from .TextManager import *
 from .data import Items, Planets
 from .data.Planets import MAKTAR_ARENA_LOCATIONS_TEXT, JOBA_ARENA_LOCATIONS_TEXT, ArenaLocationTextInfo
+from .data.Items import EquipmentData
+from .data.Locations import LocationData
+from .data.RamAddresses import Addresses
 
 if TYPE_CHECKING:
     from .Rac2Client import Rac2Context
@@ -12,30 +15,49 @@ if TYPE_CHECKING:
 
 def update(ctx: 'Rac2Context', ap_connected: bool):
     """Called continuously as long as a planet is loaded"""
-
     game_interface = ctx.game_interface
     planet = ctx.current_planet
 
     if planet is Rac2Planet.Title_Screen or planet is None:
         return
 
-    replace_text(ctx, ap_connected)
-
-    # Ship Wupash if option is enabled.
-    if ap_connected and ctx.slot_data.get("skip_wupash_nebula", False):
-        game_interface.pcsx2_interface.write_int8(game_interface.addresses.wupash_complete_flag, 1)
-
     button_input: int = game_interface.pcsx2_interface.read_int16(game_interface.addresses.controller_input)
     if button_input == 0x10F:  # L1 + L2 + R1 + R2 + SELECT
         if game_interface.switch_planet(Rac2Planet.Ship_Shack):
             game_interface.logger.info("Resetting to Ship Shack")
 
+    replace_text(ctx, ap_connected)
+
     if not ap_connected:
         if ctx.notification_manager.queue_size() == 0:
             ctx.notification_manager.queue_notification("\14Warning!\10 Not connected to Archipelago server", 1.0)
+        return
+
+    try:
+        handle_vendor(ctx)
+    except MissingAddressError:
+        pass
+
+    if ctx.slot_data is not None:
+        # Handle some edge-case weapons XP if extended weapon progression is enabled
+        if ctx.slot_data.get("extend_weapon_progression", False):
+            handle_specific_weapon_xp(ctx)
 
 
-def init(ctx: 'Rac2Context', ap_connected: bool):
+def init(ctx: 'Rac2Context'):
+    """Called every time the player lands on a planet or connects to Archipelago server"""
+    if ctx.current_planet is Rac2Planet.Title_Screen or ctx.current_planet is None:
+        return
+
+    # Ship Wupash if option is enabled.
+    if ctx.slot_data.get("skip_wupash_nebula", False):
+        ctx.game_interface.pcsx2_interface.write_int8(ctx.game_interface.addresses.wupash_complete_flag, 1)
+
+    for addr, bitmask in ctx.game_interface.addresses.cutscene_flags:
+        value = ctx.game_interface.pcsx2_interface.read_int8(addr)
+        if value & bitmask == 0:
+            ctx.game_interface.pcsx2_interface.write_int8(addr, value | bitmask)
+
     # TODO: Make these warnings better
     unstuck_message: str = (
         "It appears that you don't have the required equipment to escape this area.\1\1"
@@ -55,6 +77,29 @@ def init(ctx: 'Rac2Context', ap_connected: bool):
             ctx.notification_manager.queue_notification(unstuck_message, 5.0)
 
 
+def handle_specific_weapon_xp(ctx: 'Rac2Context'):
+    game_interface = ctx.game_interface
+
+    # If extended weapon progression is enabled, we need to regularly transfer XP from Qwark Statuette to Walloper,
+    # since the Walloper adds XP to the wrong equipment and it would be hard to fix
+    pending_walloper_xp = game_interface.get_weapon_xp(Items.QWARK_STATUETTE.offset)
+    if pending_walloper_xp > 0:
+        current_walloper_xp = game_interface.get_weapon_xp(Items.WALLOPER.offset)
+        game_interface.set_weapon_xp(Items.QWARK_STATUETTE.offset, 0)
+        # There are rare times where that XP increases even without using the walloper (most likely enemies killing
+        # other enemies), so we discard the XP instead of transferring it if walloper is not equipped
+        if game_interface.get_equipped_weapon() == Items.WALLOPER.offset:
+            game_interface.set_weapon_xp(Items.WALLOPER.offset, current_walloper_xp + pending_walloper_xp)
+
+    # Track decoy glove ammo to add experience on use, since it cannot do damage
+    decoy_glove_ammo = game_interface.get_ammo(Items.DECOY_GLOVE)
+    used_decoy_gloves = ctx.previous_decoy_glove_ammo - decoy_glove_ammo
+    ctx.previous_decoy_glove_ammo = decoy_glove_ammo
+    if used_decoy_gloves > 0:
+        decoy_glove_xp = game_interface.get_weapon_xp(Items.DECOY_GLOVE.offset)
+        game_interface.set_weapon_xp(Items.DECOY_GLOVE.offset, decoy_glove_xp + 0x180)
+
+
 def replace_text(ctx: 'Rac2Context', ap_connected: bool):
     try:
         manager = TextManager(ctx)
@@ -68,6 +113,7 @@ def replace_text(ctx: 'Rac2Context', ap_connected: bool):
             return
 
         process_spaceship_text(manager, ctx)
+        process_vendor_text(manager, ctx)
 
         if ctx.current_planet is Rac2Planet.Oozla:
             item_name = get_rich_item_name_from_location(ctx, Locations.OOZLA_MEGACORP_SCIENTIST.location_id)
@@ -170,6 +216,54 @@ def process_spaceship_text(manager: TextManager, ctx: 'Rac2Context'):
     else:
         text = f"{COLOR_GREEN}Perfect race reward already obtained"
     manager.inject(data.challenge_descriptions[3], wrap_for_spaceship_menu(text))
+
+
+def handle_vendor(ctx: "Rac2Context"):
+    interface: Rac2Interface = ctx.game_interface
+    addresses: Addresses = ctx.game_interface.addresses
+
+    if interface.get_pause_state() == PauseState.VENDOR.value:
+        if interface.vendor.mode is Vendor.Mode.CLOSED and interface.vendor.get_type() is Vendor.Type.WEAPON:
+            if interface.vendor.is_megacorp():
+                interface.vendor.change_mode(ctx, Vendor.Mode.MEGACORP)
+            else:
+                interface.vendor.change_mode(ctx, Vendor.Mode.GADGETRON)
+
+    if interface.get_pause_state() != PauseState.VENDOR.value and interface.vendor.mode is not Vendor.Mode.CLOSED:
+        interface.vendor.change_mode(ctx, Vendor.Mode.CLOSED)
+
+    # Use Down/Up to toggle between ammo/weapon mode
+    holding_down: bool = interface.pcsx2_interface.read_int16(addresses.controller_input) == 0x4000
+    holding_up: bool = interface.pcsx2_interface.read_int16(addresses.controller_input) == 0x1000
+    if holding_down and interface.vendor.mode is Vendor.Mode.MEGACORP:
+        interface.vendor.change_mode(ctx, Vendor.Mode.AMMO)
+    if holding_up and interface.vendor.mode is Vendor.Mode.AMMO:
+        interface.vendor.change_mode(ctx, Vendor.Mode.MEGACORP)
+
+
+def process_vendor_text(manager: TextManager, ctx: "Rac2Context") -> None:
+    equipment_data: int = ctx.game_interface.addresses.planet[ctx.current_planet].equipment_data
+    if not equipment_data:
+        return
+
+    vendor: Vendor = ctx.game_interface.vendor
+    if vendor.mode is Vendor.Mode.MEGACORP:
+        for location, weapon in zip(Locations.MEGACORP_VENDOR_LOCATIONS, Items.MEGACORP_VENDOR_WEAPONS):
+            text_id = ctx.game_interface.pcsx2_interface.read_int32(equipment_data + weapon.offset * 0xE0 + 0x08)
+            item_name = get_rich_item_name_from_location(ctx, location.location_id)
+            manager.inject(text_id, item_name)
+    elif vendor.mode is Vendor.Mode.GADGETRON:
+        for location, weapon in zip(Locations.GADGETRON_VENDOR_LOCATIONS, Items.GADGETRON_VENDOR_WEAPONS):
+            text_id = ctx.game_interface.pcsx2_interface.read_int32(equipment_data + weapon.offset * 0xE0 + 0x08)
+            item_name = get_rich_item_name_from_location(ctx, location.location_id)
+            manager.inject(text_id, item_name)
+    else:
+        locations: list[LocationData] = list(Locations.MEGACORP_VENDOR_LOCATIONS) + list(Locations.GADGETRON_VENDOR_LOCATIONS)
+        weapons: list[EquipmentData] = list(Items.MEGACORP_VENDOR_WEAPONS) + list(Items.GADGETRON_VENDOR_WEAPONS)
+        weapons.remove(Items.CLANK_ZAPPER)
+        for i in range(len(locations)):
+            text_id = ctx.game_interface.pcsx2_interface.read_int32(equipment_data + weapons[i].offset * 0xE0 + 0x08)
+            manager.inject(text_id, weapons[i].name)
 
 
 def process_arena_text(manager: TextManager, ctx: 'Rac2Context', locations_text_data: Dict[int, ArenaLocationTextInfo]):

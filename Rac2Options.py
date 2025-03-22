@@ -10,22 +10,41 @@ from Options import (
 from dataclasses import dataclass
 
 
-class ShuffleWeaponVendors(Choice):
-    """Shuffle what items appear at the Megacorp and Gadgetron vendors. Also shuffles your two starting weapons.
-    Off: The vendors will stay unmodified.
-    Weapons: All weapons that are normally available at the vendors will be shuffled among the vendor slots.
+class StartingWeapons(Choice):
+    """Randomize what two weapons you start the game with.
+    Vanilla: Start with the Lancer and Gravity Bomb.
+    Balanced: Start with two random weapons that are relatively balanced.
+    Non-Broken: Start with two random weapons besides RYNO II and Zodiac.
+    Unrestricted: Start with any two non-upgraded weapons.
     """
-
-    option_off = 0
-    option_weapons = 1
+    display_name = "Starting Weapons"
+    option_vanilla = 0
+    option_balanced = 1
+    option_non_broken = 2
+    option_unrestricted = 3
     default = 0
 
 
-class SkipWupashNebula(Toggle):
-    """Skips the Wupash Nebula ship section that appears when first traveling to Maktar Nebula."""
+class RandomizeGadgetronVendor(Toggle):
+    """Randomize what items appear at the Gadgetron vendor on Barlow."""
+    display_name = "Randomize Gadgetron Vendor"
 
+
+class RandomizeMegacorpVendor(Toggle):
+    """ Randomize what items appear at the Megacorp vendor. New items will get added as you visit more planets.
+    When enabled, you can switch between buying items and buying ammo by pressing up/down when in the vendor."""
+    display_name = "Randomize Megacorp Vendor"
+
+
+class ExcludeVeryExpensiveItems(DefaultOnToggle):
+    """Exclude RYNO II and Zodiac from the randomization leaving them at their vanilla locations.
+    This will only take effect if the corresponding vendors are randomized"""
+    display_name = "Exclude Very Expensive Items"
+
+
+class SkipWupashNebula(DefaultOnToggle):
+    """Skips the Wupash Nebula ship section that appears when first traveling to Maktar Nebula."""
     display_name = "Skip Wupash Nebula"
-    default = True
 
 
 class AllowFirstPersonMode(DefaultOnToggle):
@@ -64,15 +83,15 @@ class NanotechExperienceMultiplier(Range):
     """A multiplier applied to experience gained for Nanotech levels, in percent."""
     display_name = "Nanotech XP Multiplier"
     range_start = 20
-    range_end = 400
+    range_end = 600
     default = 100
 
 
 class WeaponExperienceMultiplier(Range):
     """A multiplier applied to experience gained for weapon levels, in percent."""
     display_name = "Weapon XP Multiplier"
-    range_start = 20
-    range_end = 400
+    range_start = 30
+    range_end = 600
     default = 100
 
 
@@ -88,11 +107,21 @@ class ExtraArenaChallengeLocations(Toggle):
     display_name = "Extra Arena Challenge Locations"
 
 
+class ExtendWeaponProgression(Toggle):
+    """If enabled, make all weapon tiers obtainable through weapon experience. This means LV2 (orange) weapons can
+    upgrade into LV3 (yellow) weapons, which can then upgrade into LV4 (blue) weapons.
+    This effectively makes all weapons that are usually restricted to NG+ available with enough grinding."""
+    display_name = "Extended Weapon Progression"
+
+
 @dataclass
 class Rac2Options(PerGameCommonOptions):
     start_inventory_from_pool: StartInventoryPool
     death_link: DeathLink
-    shuffle_weapon_vendors: ShuffleWeaponVendors
+    starting_weapons: StartingWeapons
+    randomize_megacorp_vendor: RandomizeMegacorpVendor
+    randomize_gadgetron_vendor: RandomizeGadgetronVendor
+    exclude_very_expensive_items: ExcludeVeryExpensiveItems
     skip_wupash_nebula: SkipWupashNebula
     allow_first_person_mode: AllowFirstPersonMode
     enable_bolt_multiplier: EnableBoltMultiplier
@@ -103,3 +132,4 @@ class Rac2Options(PerGameCommonOptions):
     weapon_xp_multiplier: WeaponExperienceMultiplier
     extra_spaceship_challenge_locations: ExtraSpaceshipChallengeLocations
     extra_arena_challenge_locations: ExtraArenaChallengeLocations
+    extend_weapon_progression: ExtendWeaponProgression
