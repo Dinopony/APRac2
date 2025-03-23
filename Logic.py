@@ -71,3 +71,9 @@ def has_qwark_statuette(state: CollectionState, player: int) -> bool:
 
 def has_hypnomatic_parts(state: CollectionState, player: int) -> bool:
     return state.has(Items.HYPNOMATIC_PART.name, player, 3)
+
+
+def can_reach_joba_arena(state: CollectionState, player: int) -> bool:
+    return can_dynamo(state, player) \
+        and can_improved_jump(state, player) \
+        and can_levitate(state, player)

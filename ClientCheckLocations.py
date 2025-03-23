@@ -37,7 +37,7 @@ INVENTORY_OFFSET_TO_LOCATION_ID: Dict[int, int] = {
     Items.ARMOR_MAGNETIZER.offset: Locations.TODANO_STUART_ZURGO_TRADE.location_id,
     Items.LEVITATOR.offset: Locations.JOBA_SHADY_SALESMAN.location_id,
     Items.SWINGSHOT.offset: Locations.ENDAKO_CLANK_APARTMENT_SS.location_id,
-    Items.GRAVITY_BOOTS.offset: Locations.JOBA_ARENA_BATTLE.location_id,
+    Items.GRAVITY_BOOTS.offset: Locations.JOBA_ARENA_FIRST_BATTLE.location_id,
     Items.GRIND_BOOTS.offset: Locations.ENDAKO_CLANK_APARTMENT_GB.location_id,
     Items.GLIDER.offset: Locations.TABORA_UNDERGROUND_MINES_END.location_id,
     Items.DYNAMO.offset: Locations.OOZLA_OUTSIDE_MEGACORP_STORE.location_id,

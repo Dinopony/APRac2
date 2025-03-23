@@ -139,11 +139,9 @@ def replace_text(ctx: 'Rac2Context', ap_connected: bool):
             item_name = get_rich_item_name_from_location(ctx, Locations.JOBA_SHADY_SALESMAN.location_id)
             manager.inject(0x27BB, wrap_for_hud(f"\x12 Buy {item_name} for %d bolts"))
             manager.inject(0x27BC, wrap_for_hud(f"You need %d bolts for {item_name}"))
-            item_name = get_rich_item_name_from_location(ctx, Locations.JOBA_ARENA_BATTLE.location_id)
-            manager.inject(0x2F66, f"Battle for {item_name}")
+            item_name = get_rich_item_name_from_location(ctx, Locations.JOBA_ARENA_FIRST_BATTLE.location_id)
             manager.inject(0x2F96, f"You have earned {item_name}")
             item_name = get_rich_item_name_from_location(ctx, Locations.JOBA_ARENA_CAGE_MATCH.location_id)
-            manager.inject(0x2F67, f"Cage Match for {item_name}")
             manager.inject(0x2F97, f"You have earned {item_name}")
             process_arena_text(manager, ctx, JOBA_ARENA_LOCATIONS_TEXT)
 

@@ -26,58 +26,66 @@ OOZLA_SWAMP_MONSTER_II = LocationData(
 )
 
 """ Maktar """
-MAKTAR_ARENA_ELECTROLYZER = LocationData(20, "Maktar Arena: First Challenge")
+MAKTAR_ARENA_ELECTROLYZER = LocationData(20, "Maktar Arena: First Battle")
 MAKTAR_PHOTO_BOOTH = LocationData(21, "Maktar: Photo Booth", can_electrolyze)
 MAKTAR_DEACTIVATE_JAMMING_ARRAY = LocationData(22, "Maktar: Deactivate Jamming Array", can_tractor)
 MAKTAR_JAMMING_ARRAY_PB = LocationData(23, "Maktar: Jamming Array - Platinum Bolt", can_tractor)
 MAKTAR_CRANE_PB = LocationData(24, "Maktar: Crane - Platinum Bolt")
 MAKTAR_ARENA_CHAINBLADE = LocationData(
-    2000, "Maktar Arena: Chainblade Challenge",
+    400, "Maktar Arena: Chainblade Challenge",
+    access_rule=lambda state, player: True,  # TODO: Evaluate required power + health
     checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x1,
     enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
 )
 MAKTAR_ARENA_TIME_30S = LocationData(
-    2001, "Maktar Arena: 30 Seconds Challenge",
+    401, "Maktar Arena: 30 Seconds Challenge",
+    access_rule=lambda state, player: True,  # TODO: Evaluate required power + health
     checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x2,
     enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
 )
 MAKTAR_ARENA_HAZARD = LocationData(
-    2002, "Maktar Arena: Hazard Challenge",
+    402, "Maktar Arena: Hazard Challenge",
+    access_rule=lambda state, player: True,  # TODO: Evaluate required power + health
     checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x3,
     enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
 )
 MAKTAR_ARENA_B2_BRAWLER = LocationData(
-    2003, "Maktar Arena: Battle the B2 Brawler",
+    403, "Maktar Arena: Battle the B2 Brawler",
+    access_rule=lambda state, player: True,  # TODO: Evaluate required power + health
     checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x4,
     enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
 )
 MAKTAR_ARENA_TIME_60S = LocationData(
-    2004, "Maktar Arena: 60 Seconds Challenge",
+    404, "Maktar Arena: 60 Seconds Challenge",
+    access_rule=lambda state, player: True,  # TODO: Evaluate required power + health
     checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x5,
     enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
 )
 MAKTAR_ARENA_MEGA_CHALLENGE = LocationData(
-    2005, "Maktar Arena: Mega Challenge",
+    405, "Maktar Arena: Mega Challenge",
+    access_rule=lambda state, player: True,  # TODO: Evaluate required power + health
     checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x6,
     enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
 )
 MAKTAR_ARENA_LIMITED_WEAPON_CHALLENGE = LocationData(
-    2006, "Maktar Arena: Limited Weapon Challenge",
+    406, "Maktar Arena: Limited Weapon Challenge",
+    access_rule=lambda state, player: state.has("Heavy Lancer", player),  # TODO: Evaluate required health
     checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x7,
     enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
 )
 MAKTAR_ARENA_TAG_TEAM = LocationData(
-    2007, "Maktar Arena: Tag Team Battle",
+    407, "Maktar Arena: Tag Team Battle",
+    access_rule=lambda state, player: True,  # TODO: Evaluate required power + health
     checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x8,
     enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
 )
 MAKTAR_ARENA_ENDURANCE = LocationData(
-    2008, "Maktar Arena: Endurance Challenge",
+    408, "Maktar Arena: Endurance Challenge",  # TODO: Evaluate required power + health
     checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0x9,
     enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
 )
 MAKTAR_ARENA_ULTIMATE = LocationData(
-    2009, "Maktar Arena: Ultimate Challenge",
+    409, "Maktar Arena: Ultimate Challenge",  # TODO: Evaluate required power + health
     checked_flag_address=lambda ram: ram.maktar_arena_challenge_wins + 0xA,
     enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
 )
@@ -227,19 +235,13 @@ JOBA_SHADY_SALESMAN = LocationData(
     111, "Joba: Shady Salesman - Levitator",
     lambda state, player: can_dynamo(state, player) and can_improved_jump(state, player)
 )
-JOBA_ARENA_BATTLE = LocationData(
-    112, "Joba: Arena Battle - Gravity Boots",
-    lambda state, player:
-        can_dynamo(state, player)
-        and can_improved_jump(state, player)
-        and can_levitate(state, player)
+JOBA_ARENA_FIRST_BATTLE = LocationData(
+    112, "Joba Arena: First Battle",
+    access_rule=can_reach_joba_arena,  # TODO: Evaluate required power + health
 )
 JOBA_ARENA_CAGE_MATCH = LocationData(
-    113, "Joba: Arena Cage Match - Infiltrator",
-    lambda state, player:
-        can_dynamo(state, player)
-        and can_improved_jump(state, player)
-        and can_levitate(state, player)
+    113, "Joba Arena: Cage Match",
+    access_rule=can_reach_joba_arena,  # TODO: Evaluate required power + health
 )
 JOBA_HIDDEN_CLIFF_PB = LocationData(
     114, "Joba: Hidden Cliff - Platinum Bolt",
@@ -254,6 +256,60 @@ JOBA_LEVITATOR_TOWER_PB = LocationData(
 )
 JOBA_HOVERBIKE_RACE_SHORTCUT_NT = LocationData(116, "Joba: Hoverbike Race Shortcut - Nanotech Boost", can_swingshot)
 JOBA_TIMED_DYNAMO_NT = LocationData(117, "Joba: Timed Dynamo Course - Nanotech Boost", can_dynamo)
+JOBA_ARENA_ARACHNOID_BATTLE = LocationData(
+    410, "Joba Arena: Arachnoid Battle",
+    access_rule=can_reach_joba_arena,  # TODO: Evaluate required power + health
+    checked_flag_address=lambda ram: ram.joba_arena_challenge_wins + 0x2,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+JOBA_ARENA_DAMAGE_AVOIDANCE = LocationData(
+    411, "Joba Arena: Damage Avoidance Challenge",
+    access_rule=can_reach_joba_arena,  # TODO: Evaluate required power + health
+    checked_flag_address=lambda ram: ram.joba_arena_challenge_wins + 0x3,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+JOBA_ARENA_HAZARD_CAGE_MATCH = LocationData(
+    412, "Joba Arena: Hazard Cage Match",
+    access_rule=can_reach_joba_arena,  # TODO: Evaluate required power + health
+    checked_flag_address=lambda ram: ram.joba_arena_challenge_wins + 0x4,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+JOBA_ARENA_TIME_90S = LocationData(
+    413, "Joba Arena: Time Challenge (90s)",
+    access_rule=can_reach_joba_arena,  # TODO: Evaluate required power (can it be done wrench only? which wrench lvl?)
+    checked_flag_address=lambda ram: ram.joba_arena_challenge_wins + 0x5,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+JOBA_ARENA_MEGAPEDE = LocationData(
+    414, "Joba Arena: Megapede Challenge",
+    access_rule=can_reach_joba_arena,  # TODO: Evaluate required power (+ range?) -> way less constrained than timed
+    checked_flag_address=lambda ram: ram.joba_arena_challenge_wins + 0x6,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+JOBA_ARENA_WRENCH_ONLY = LocationData(
+    415, "Joba Arena: Wrench Only Challenge",
+    access_rule=can_reach_joba_arena,  # TODO: Evaluate required health
+    checked_flag_address=lambda ram: ram.joba_arena_challenge_wins + 0x7,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+JOBA_ARENA_TIMED_LANCER = LocationData(
+    416, "Joba Arena: Timed Lancer Only Challenge",
+    access_rule=can_reach_joba_arena,  # TODO: Requires Heavy Lancer?
+    checked_flag_address=lambda ram: ram.joba_arena_challenge_wins + 0xA,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+JOBA_ARENA_TIMED_MEGAPEDE = LocationData(
+    417, "Joba Arena: Kill Megapede in 3 Minutes",
+    access_rule=can_reach_joba_arena,  # TODO: Evaluate required power (+ range?)
+    checked_flag_address=lambda ram: ram.joba_arena_challenge_wins + 0x8,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
+JOBA_ARENA_IMPOSSIBLE_CHALLENGE = LocationData(
+    418, "Joba Arena: Impossible Challenge",
+    access_rule=can_reach_joba_arena,  # TODO: Evaluate required power + health
+    checked_flag_address=lambda ram: ram.joba_arena_challenge_wins + 0x9,
+    enable_if=lambda options_dict: options_dict["extra_arena_challenge_locations"]
+)
 
 """ Todano """
 TODANO_SEARCH_ROCKET_SILO = LocationData(

@@ -13,7 +13,8 @@ class Addresses:
             # self.ship_shack_discovered: int = 0x1395CF
             self.weapon_subid_table = 0x139568
             # self.dobbo_defeat_thug_leader: int = 0x1395E6
-            # self.electrolyzer_battle_victories: int = 0x1395E9
+            self.maktar_arena_challenge_wins: int = 0x1395E9
+            self.joba_arena_challenge_wins: int = 0x1395F5
             # self.barlow_hoverbike_race_victories: int = 0x139605
             # self.joba_hoverbike_1_victories: int = 0x13960F
             self.feltzin_challenge_wins: int = 0x139619
